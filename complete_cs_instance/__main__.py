@@ -1,4 +1,8 @@
 
+"""
+A python package and util used for converting IANA format ciphersuites in to their respective technologies.
+"""
+
 import argparse
 import re
 import json
@@ -22,14 +26,22 @@ def main():
 
     rows = []
     for cipher in y:
+        # Retrieve hexcode bytes and format fields dict
         hex1 = cipher.get("fields", {}).get("hex_byte_1")
         hex2 = cipher.get("fields", {}).get("hex_byte_2")
         hex3 = cipher.get("fields", {}).get("hex_byte_3", None)
+        fields = {"hex_byte_1": hex1, "hex_byte_2": hex2}
+        if hex3:
+            fields["hex_byte_3"] = hex3
+
         c = ciphersuite._make([cipher["pk"], hex1, hex2, hex3])
         parsed = complete_cs_instance(c)
-        hexcode = f"{hex1},{hex2}{','+hex3 if hex3 else ''}"
-        rows.append({"Value": hexcode, "Description": cipher["pk"], **parsed})
-    
+        rows.append({
+            "model": "directory.Ciphersuite",
+            "pk": cipher["pk"],
+            "fields": {**fields, **parsed}
+        })
+
     print(yaml.dump(rows, sort_keys=False))
 
 if __name__ == "__main__":

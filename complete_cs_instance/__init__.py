@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 """
-A pyproject compliant cookiecutter template for Python packages.
+A python package and util used for converting IANA format ciphersuites in to their respective technologies.
 """
 
 import yaml
@@ -31,7 +31,7 @@ def complete_cs_instance(instance, *args, **kwargs):
                 enc = "NULL"
         else:
             kex = "RSA"
-            aut = "RSA"  
+            aut = "RSA"
 
     # GOST TLSv1.2 ciphers
     elif (instance.hex_byte_1 == '0xC1' and instance.hex_byte_2 == '0x00') or\
@@ -144,12 +144,12 @@ def complete_cs_instance(instance, *args, **kwargs):
         (kex,_,rst) = rst.partition("WITH")
 
         # add information about export-grade cipher to protocol version
-        if export_flag:
-            prt += " EXPORT"
+        # if export_flag:
+        #     prt += " EXPORT"
 
         # add information about OLD pre-IETF adopted status to protocol version
-        if old_flag:
-            prt = "OLD " + prt
+        # if old_flag:
+        #     prt = "OLD " + prt
 
         # split kex again, potentially yielding auth algorithm
         # otherwise this variable will remain unchanged
@@ -158,8 +158,8 @@ def complete_cs_instance(instance, *args, **kwargs):
 
         # NOTE: In instances where FIPS is in ciphersuite name, append it to kex
         #  which is extremely likely to be RSA, thus both kex and auth
-        if fips_flag:
-            kex += " FIPS"
+        # if fips_flag:
+        #     kex += " FIPS"
 
         # split enc again if we only got a number for hsh
         # specifically needed for CCM/CCM8 ciphers
@@ -177,21 +177,21 @@ def complete_cs_instance(instance, *args, **kwargs):
 
     parsed = {}
 
-    parsed["ProtocolVersion"]=prt.strip()
-    parsed["old"]=old_flag
+    parsed["protocol_version"] = prt.strip()
+    parsed["old"] = old_flag
     parsed["export"] = export_flag
     parsed["fips"] = fips_flag
 
-    parsed["KexAlgorithm"]=kex.strip()
+    parsed["kex_algorithm"] = kex.strip()
     # connect foreign keys from other models
     # if aut is not excplicitly defined, set it equal to kex
-    if not aut:
-        parsed["AuthAlgorithm"]=kex.strip()
-    else:
-        parsed["AuthAlgorithm"]=aut.strip()
+    # if not aut:
+    parsed["auth_algorithm"] = aut.strip() if aut else kex.strip()
+    # else:
+    #     parsed["AuthAlgorithm"]=aut.strip()
 
-    parsed["EncAlgorithm"]=enc.strip()
+    parsed["enc_algorithm"] = enc.strip()
     parsed["aead_algorithm"] = aead_flag
-    parsed["HashAlgorithm"]=hsh.strip()
+    parsed["hash_algorithm"] = hsh.strip()
 
     return parsed

@@ -1,6 +1,6 @@
 # complete_cs_instance
 
-A pyproject compliant cookiecutter template for Python packages.
+A python package and util used for converting IANA format ciphersuites in to their respective technologies.
 
 ## Usage
 
